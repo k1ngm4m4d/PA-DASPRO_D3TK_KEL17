@@ -1,39 +1,38 @@
 #include <stdio.h>
+#include <string.h>
 
-void biner_ke_polinomial(const char *binary) {
-    // Example implementation: print the binary representation and its length.
-    printf("Binary: %s\n", binary);
-    printf("Length: %lu\n", strlen(binary));
+// Function to perform CRC calculation
+void calculateCRC(char* data, int dataLength, char* divisor, int divisorLength) {
+    // Append zeros to data based on divisor length
+    for (int i = 0; i < divisorLength - 1; i++) {
+        strcat(data, "0");
+    }
+
+    int dataSize = strlen(data);
+
+    // Perform CRC calculation
+    for (int i = 0; i < dataSize - divisorLength + 1; i++) {
+        if (data[i] == '1') {
+            // XOR operation
+            for (int j = 0; j < divisorLength; j++) {
+                data[i + j] = (data[i + j] == divisor[j]) ? '0' : '1';
+            }
+        }
+    }
 }
 
 int main() {
-    FILE *file = fopen("data_nim.txt", "r");
-    if (file == NULL) {
-        printf("Gagal membuka file.\n");
-        return -1;
-    }
+    char data[] = "10110011";  // Example data in binary
+    char divisor[] = "10011";  // Example divisor in binary
 
-    int NIM[20];
-    int i = 0;
+    int dataLength = strlen(data);
+    int divisorLength = strlen(divisor);
 
-    while (fscanf(file, "%d", &NIM[i]) == 1 && i < 20) {
-        i++;
-    }
+    // Calculate CRC
+    calculateCRC(data, dataLength, divisor, divisorLength);
 
-    fclose(file);
-
-    if (i < 20) {
-        printf("Gagal membaca NIM dari file.\n");
-        return -1;
-    }
-
-    for (int j = 0; j < i; j++) {
-        char bilangan_biner[33]; // 32 bits + null terminator
-        snprintf(bilangan_biner, sizeof(bilangan_biner), "%d", NIM[j]);
-        printf("NIM_%d_Biner: %s\n", j + 1, bilangan_biner);
-        printf("NIM_%d_Polinomial: ", j + 1);
-        biner_ke_polinomial(bilangan_biner);
-    }
+    // Print the final CRC
+    printf("CRC Result: %s\n", data);
 
     return 0;
 }
